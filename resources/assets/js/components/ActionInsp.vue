@@ -2346,8 +2346,7 @@
                         me.listService(1,'','name');
                         swalWithBootstrapButtons(
                           'Good work soldier!',
-                          'Go back and take a rest',
-                          '幸苦了'
+                          'Go back and take a rest'
                         )
                       })
                       .catch(function (error) {
@@ -2639,8 +2638,7 @@
                     me.listService(1,'','name');
                     swalWithBootstrapButtons(
                       'Good work soldier!',
-                      'Go back and take a rest',
-                      '幸苦了'
+                      'Go back and take a rest'
                     )
                   })
                   .catch(function (error) {
@@ -2770,8 +2768,7 @@
                       me.listService(1,'','name');
                       swalWithBootstrapButtons(
                         'Good work soldier!',
-                        'Go back and take a rest',
-                        '幸苦了'
+                        'Go back and take a rest'
                       )
                     })
                     .catch(function (error) {

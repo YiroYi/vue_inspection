@@ -6,7 +6,7 @@
  */
 
 require('./bootstrap');
-
+window.$ = window.jQuery = require('jquery');
 window.Vue = require('vue');
 
 /**
@@ -52,11 +52,64 @@ Vue.component('reportingsfa', require('./components/ReportingSfa.vue'));
 Vue.component('complete', require('./components/CompleteInspection.vue'));
 Vue.component('cancel', require('./components/ServiceCancel.vue'));
 Vue.component('invoice', require('./components/Invoice.vue'));
+Vue.component('notification', require('./components/Notification.vue'));
+Vue.component('notification-cs', require('./components/NotificationCs.vue'));
+Vue.component('notification-csch', require('./components/NotificationCsCh.vue'));
+Vue.component('notification-foll', require('./components/NotificationFollowup.vue'));
 
 
 const app = new Vue({
     el: '#app',
     data: {
-      menu : 0
+      menu : 0,
+      notifications: [],
+      notificationscs: [],
+      notificationscsch: [],
+      notificationsfoll: [],
+
+    },
+    created() {
+      let me = this;
+
+
+      axios.post('notification/getAdmin').then(function(response){
+        me.notifications=response.data;
+        axios.post('notification/getCs').then(function(response){
+          me.notificationscs=response.data;
+          axios.post('notification/getCsCh').then(function(response){
+            me.notificationscsch=response.data;
+            axios.post('notification/getNotFoll').then(function(response){
+              me.notificationsfoll=response.data;
+            })
+          })
+        })
+      }).catch(function(error){
+        console.log(error);
+      });
+
+      var userId = $('meta[name="userId"]').attr('content');
+
+      Echo.private('App.User.' + userId).notification((notification)=>{
+        me.notifications.unshift(notification);
+      });
+
+      var userId = $('meta[name="userId"]').attr('content');
+
+      Echo.private('App.User.' + userId).notification((notification)=>{
+        me.notificationscs.unshift(notification);
+      });
+
+      var userId = $('meta[name="userId"]').attr('content');
+
+      Echo.private('App.User.' + userId).notification((notification)=>{
+        me.notificationscsch.unshift(notification);
+      });
+
+      var userId = $('meta[name="userId"]').attr('content');
+
+      Echo.private('App.User.' + userId).notification((notification)=>{
+        me.notificationsfoll.unshift(notification);
+      });
+
     }
 });

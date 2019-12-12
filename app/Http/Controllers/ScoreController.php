@@ -21,6 +21,8 @@ use App\Ftyfivequestion;
 use Illuminate\Support\Facades\Auth;
 use Image;
 use Carbon\Carbon;
+use App\Notifications\NotifyAdmin;
+use App\Notifications\NotifyCs;
 
 
 class ScoreController extends Controller
@@ -764,6 +766,48 @@ class ScoreController extends Controller
     $service = Service::findOrFail($request->idservice);
     $service->idistatus = 7;
     $service->save();
+
+    //Funcion para notificaciones
+
+    $numCci = DB::table('services')->where('idcategory','=',1)->where('idistatus','=',6)->count();
+    $numQci = DB::table('services')->where('idcategory','=',2)->where('idistatus','=',6)->count();
+    $numSfa = DB::table('services')->where('idcategory','=',3)->where('idistatus','=',6)->count();
+
+    $arregloCciNotify = [
+      'services'=> ['numero'=>$numCci,'msj'=>'CCI'],
+      'servicesqci'=> ['numero'=>$numQci,'msj'=>'QCI'],
+      'servicessfa'=> ['numero'=>$numSfa,'msj'=>'SFA']
+    ];
+
+    $allUsers = User::where('idrol','=',1)->orWhere('idrol','=',3)->get();
+
+    foreach ($allUsers as $notificar)
+    {
+      User::findOrFail($notificar->id)->notify(new NotifyAdmin($arregloCciNotify));
+    }
+
+    //Funcion para notificaciones
+
+    //Funcion para notificaciones reportes
+
+    $repCci = DB::table('services')->where('idcategory','=',1)->where('idistatus','=',7)->count();
+    $repQci = DB::table('services')->where('idcategory','=',2)->where('idistatus','=',7)->count();
+    $repSfa = DB::table('services')->where('idcategory','=',3)->where('idistatus','=',7)->count();
+
+    $arregloRepNotify = [
+      'reportesccia'=> ['numero'=>$repCci,'msj'=>'CCI'],
+      'reportesqci'=> ['numero'=>$repQci,'msj'=>'QCI'],
+      'reportessfa'=> ['numero'=>$repSfa,'msj'=>'SFA']
+    ];
+
+    $allUsers = User::where('idrol','=',1)->orWhere('idrol','=',2)->get();
+
+    foreach ($allUsers as $notificar)
+    {
+      User::findOrFail($notificar->id)->notify(new NotifyCs($arregloRepNotify));
+    }
+
+    //Funcion para notificaciones reportes
 
     DB::commit();
 

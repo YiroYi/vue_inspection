@@ -17,11 +17,16 @@ Route::group(['middleware' => ['guest']], function () {
 });
 
 Route::group(['middleware' => ['auth']], function () {
+  Route::post('logout','Auth\LoginController@logout')->name('logout');
+  Route::post('notification/getAdmin','NotificationController@getAdmin');
+  Route::post('notification/getCs','NotificationController@getCs');
+  Route::post('notification/getCsCh','NotificationController@getCsCh');
+  Route::post('notification/getNotFoll','NotificationController@getNotFoll');
   Route::get('/main', function () {
       return view('content.content');
   })->name('main');
 
-    Route::post('logout','Auth\LoginController@logout')->name('logout');
+
 
 /*INICIO ADMIN*/
 Route::group(['middleware' => ['Admin']], function () {
@@ -151,6 +156,7 @@ Route::group(['middleware' => ['Admin']], function () {
 
     Route::get('invoice/indexInvoice','InvoiceController@indexInvoice');
     Route::put('invoice/printed','InvoiceController@invoicePrint');
+
 
 
 }); /*FIN ADMIN*/

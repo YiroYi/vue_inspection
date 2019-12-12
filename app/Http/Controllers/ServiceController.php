@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Service;
 use App\User;
 use App\Followup;
+use App\Notifications\NotifyCsCh;
+use Illuminate\Support\Facades\DB;
 
 
 class ServiceController extends Controller
@@ -767,6 +769,9 @@ class ServiceController extends Controller
 
       if(!$request->ajax()) return redirect('/');
 
+      try {
+        DB::beginTransaction();
+
       $this->validate($request,[
         'reference'=>'required|unique:services,reference',
       ]);
@@ -795,6 +800,33 @@ class ServiceController extends Controller
       $service->inspection_status = '1';
       $service->cs_consultant = 'Not assigned';
       $service->save();
+
+      //Funcion para notificaciones reportes
+
+      $newCci = DB::table('services')->where('idcategory','=',1)->where('idistatus','=',1)->count();
+      $newQci = DB::table('services')->where('idcategory','=',2)->where('idistatus','=',1)->count();
+      $newSfa = DB::table('services')->where('idcategory','=',3)->where('idistatus','=',1)->count();
+
+      $arregloCsNotify = [
+        'newcci'=> ['numero'=>$newCci,'msj'=>'CCI'],
+        'newqci'=> ['numero'=>$newQci,'msj'=>'QCI'],
+        'newsfa'=> ['numero'=>$newSfa,'msj'=>'SFA']
+      ];
+
+      $allUsers = User::where('idrol','=',1)->orWhere('idrol','=',2)->get();
+
+      foreach ($allUsers as $notificar)
+      {
+        User::findOrFail($notificar->id)->notify(new NotifyCsCh($arregloCsNotify));
+      }
+
+      //Funcion para notificaciones reportes//
+
+      DB::commit();
+
+      } catch (Exception $e) {
+        DB::rollback();
+      }
   }
 
 
@@ -872,10 +904,42 @@ class ServiceController extends Controller
   public function updateIstatus(Request $request)
   {
     if(!$request->ajax()) return redirect('/');
+
+    try {
+      DB::beginTransaction();
+
     $service = Service::findOrFail($request->id);
     $service->idistatus = '2';
     $service->cs_consultant = Auth::user()->user;
     $service->save();
+
+    //Funcion para notificaciones reportes
+
+    $newCci = DB::table('services')->where('idcategory','=',1)->where('idistatus','=',1)->count();
+    $newQci = DB::table('services')->where('idcategory','=',2)->where('idistatus','=',1)->count();
+    $newSfa = DB::table('services')->where('idcategory','=',3)->where('idistatus','=',1)->count();
+
+    $arregloCsNotify = [
+      'newcci'=> ['numero'=>$newCci,'msj'=>'CCI'],
+      'newqci'=> ['numero'=>$newQci,'msj'=>'QCI'],
+      'newsfa'=> ['numero'=>$newSfa,'msj'=>'SFA']
+    ];
+
+    $allUsers = User::where('idrol','=',1)->orWhere('idrol','=',2)->get();
+
+    foreach ($allUsers as $notificar)
+    {
+      User::findOrFail($notificar->id)->notify(new NotifyCsCh($arregloCsNotify));
+    }
+
+    //Funcion para notificaciones reportes//
+
+
+    DB::commit();
+
+    } catch (Exception $e) {
+      DB::rollback();
+    }
   }
 
   public function updateIstatusInspectionDate(Request $request)

@@ -22,6 +22,7 @@ use App\Monitor;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
+use App\Notifications\NotifyCs;
 use Carbon\Carbon;
 
 
@@ -627,6 +628,29 @@ class ReportController extends Controller
     $service = Service::findOrFail($request->idservice);
     $service->idistatus = 8;
     $service->save();
+
+    //Funcion para notificaciones
+
+    //Funcion para notificaciones reportes
+
+    $repCci = DB::table('services')->where('idcategory','=',1)->where('idistatus','=',7)->count();
+    $repQci = DB::table('services')->where('idcategory','=',2)->where('idistatus','=',7)->count();
+    $repSfa = DB::table('services')->where('idcategory','=',3)->where('idistatus','=',7)->count();
+
+    $arregloRepNotify = [
+      'reportesccia'=> ['numero'=>$repCci,'msj'=>'CCI'],
+      'reportesqci'=> ['numero'=>$repQci,'msj'=>'QCI'],
+      'reportessfa'=> ['numero'=>$repSfa,'msj'=>'SFA']
+    ];
+
+    $allUsers = User::where('idrol','=',1)->orWhere('idrol','=',2)->get();
+
+    foreach ($allUsers as $notificar)
+    {
+      User::findOrFail($notificar->id)->notify(new NotifyCs($arregloRepNotify));
+    }
+
+    //Funcion para notificaciones reportes//
 
     DB::commit();
 

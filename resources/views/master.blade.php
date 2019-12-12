@@ -11,6 +11,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- google font -->
     <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" rel="stylesheet" type="text/css" />
+    <meta name="userId" content="{{ Auth::check() ? Auth::user()->id : '' }}">
 	<!-- icons -->
     <link href="assets/plugins/simple-line-icons/simple-line-icons.min.css" rel="stylesheet" type="text/css" />
     <link href="fonts/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
@@ -56,11 +57,20 @@
                       <span></span>
                   </a>
                  <!-- end mobile menu -->
+
                   <!-- start header menu -->
                   <div class="top-menu">
                       <ul class="nav navbar-nav pull-right">
                       	<!-- start language menu -->
+                        <!-- Start notifications -->
 
+                        <!-- end notification -->
+                        <!-- Start notifications -->
+                        <notification-csch :notificationscsch="notificationscsch" :notificationsfoll="notificationsfoll"></notification-csch>
+                        <notification :notifications="notifications"></notification>
+                        <notification-cs :notificationscs="notificationscs"></notification-cs>
+                        
+                        <!-- end notification -->
    						           <li class="dropdown dropdown-user">
                               <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown" data-close-others="true">
                                   <!--<img alt="" class="img-circle " src="img/dp.jpg" />-->

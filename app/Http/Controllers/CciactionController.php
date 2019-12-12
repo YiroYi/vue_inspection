@@ -10,6 +10,7 @@ use App\User;
 use App\Cciaction;
 use App\Inspdetail;
 use Carbon\Carbon;
+use App\Notifications\NotifyAdmin;
 use Image;
 
 class CciactionController extends Controller
@@ -186,10 +187,33 @@ class CciactionController extends Controller
         $service->idistatus = 6;
         $service->save();
 
+        //Funcion para notificaciones
+
+        $numCci = DB::table('services')->where('idcategory','=',1)->where('idistatus','=',6)->count();
+        $numQci = DB::table('services')->where('idcategory','=',2)->where('idistatus','=',6)->count();
+        $numSfa = DB::table('services')->where('idcategory','=',3)->where('idistatus','=',6)->count();
+
+        $arregloCciNotify = [
+          'services'=> ['numero'=>$numCci,'msj'=>'CCI'],
+          'servicesqci'=> ['numero'=>$numQci,'msj'=>'QCI'],
+          'servicessfa'=> ['numero'=>$numSfa,'msj'=>'SFA']
+        ];
+
+        $allUsers = User::where('idrol','=',1)->orWhere('idrol','=',3)->get();
+
+        foreach ($allUsers as $notificar)
+        {
+          User::findOrFail($notificar->id)->notify(new NotifyAdmin($arregloCciNotify));
+        }
+
+        //Funcion para notificaciones
+
         DB::commit();
 
         } catch (Exception $e) {
           DB::rollback();
         }
     }
+
+
 }
